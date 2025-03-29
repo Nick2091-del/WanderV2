@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Wander All-in-One</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+
+nav a.active {
+      background-color: #28a745;
+      padding: 6px 10px;
+      border-radius: 6px;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      background: #f4f4f4;
+      color: #333;
+    }
+
+    header {
+      background: #333;
+      color: white;
+      padding: 15px 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      font-size: 20px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .logo img {
+      height: 28px;
+      margin-right: 10px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 15px;
+      font-size: 14px;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      margin-bottom: 25px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0 15px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    button.btn {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s ease-in-out;
+    }
+
+    button.btn:hover {
+      background-color: #218838;
+    }
+
+    .gold {
+      background-color: #f3d774;
+      color: #333;
+      font-weight: bold;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .gold:hover {
+      background-color: #e6c85e;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .badge {
+      background: #e6ffe6;
+      color: #1c4b1c;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      display: inline-block;
+      margin: 4px 4px 0 0;
+    }
+
+    .review-dots span {
+      font-size: 18px;
+      color: #ccc;
+      cursor: pointer;
+      margin-right: 4px;
+      transition: color 0.2s;
+    }
+
+    .review-dots span.selected {
+      color: #28a745;
+    }
+
+    @media (max-width: 768px) {
+      nav {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo" onclick="switchPage('dashboard')">
+      <img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" alt="Goat Icon" />
+      Wander
+    </div>
+    <nav>
+      <a href="#" onclick="switchPage('dashboard')">Dashboard</a>
+      <a href="#" onclick="switchPage('events')">Events</a>
+      <a href="#" onclick="switchPage('missions')">Missions</a>
+      <a href="#" onclick="switchPage('messages')">Messages</a>
+      <a href="#" onclick="switchPage('settings')">Settings</a>
+      <a href="#" onclick="switchPage('profile')">Profile</a>
+      <a href="#" onclick="switchPage('membership')">Membership</a>
+      <a href="#" onclick="switchPage('myEvents')">My Events</a>
+    </nav>
+    
+    
+  </header>
+
+  <div class="container">
+<!-- LOGIN MODAL -->
+<div id="loginModal" style="display: none; position: fixed; top: 0; left: 0;
+  width: 100vw; height: 100vh; background: rgba(0,0,0,0.5);
+  justify-content: center; align-items: center; z-index: 1000;">
+  <div style="background: white; padding: 30px; border-radius: 10px; width: 300px; text-align: center; position: relative;">
+    <span onclick="closeLoginModal()" 
+          style="position: absolute; top: 10px; right: 15px; cursor: pointer; font-size: 20px;">&times;</span>
+    <h2 id="modalTitle">Login</h2>
+    <input type="email" id="modalEmail" placeholder="Email" /><br>
+    <input type="password" id="modalPass" placeholder="Password" /><br>
+    <button class="btn" id="modalActionBtn" onclick="handleLogin()">Login</button>
+    <p id="switchPrompt">Don't have an account? <a href="#" onclick="showSignupModal()">Create one now</a></p>
+  </div>
+</div>
+
+<!-- SIGNUP MODAL -->
+<div id="signupModal" style="display: none; position: fixed; top: 0; left: 0;
+  width: 100vw; height: 100vh; background: rgba(0,0,0,0.5);
+  justify-content: center; align-items: center; z-index: 1000;">
+  <div style="background: white; padding: 30px; border-radius: 10px; width: 300px; text-align: center; position: relative;">
+    <span onclick="closeSignupModal()" 
+          style="position: absolute; top: 10px; right: 15px; cursor: pointer; font-size: 20px;">&times;</span>
+    <h2>Create Account</h2>
+    <input type="text" id="signupName" placeholder="Name" /><br>
+    <input type="email" id="signupEmail" placeholder="Email" /><br>
+    <input type="password" id="signupPass" placeholder="Password" /><br>
+    <button class="btn" onclick="handleSignup()">Sign Up</button>
+    <p>Already have an account? <a href="#" onclick="showLoginModal()">Log in</a></p>
+  </div>
+</div>
+
+<!-- PROFILE SETUP PAGE -->
+<section id="profile" class="hidden">
+  <div class="card">
+    <h2>Edit Profile</h2>
+    <input type="text" placeholder="Your Name" />
+    <label>Age</label>
+    <select id="editAgeSelect"></select>
+
+    <label>Education</label>
+    <select>
+      <option>High School</option>
+      <option>Associate Degree</option>
+      <option>Bachelor's Degree</option>
+      <option>Master's Degree</option>
+      <option>Doctorate</option>
+    </select>
+
+    <label>Industry</label>
+<select id="industrySelect2" multiple></select>
+
+
+<label>Interests</label>
+<select id="interestSelect2" multiple></select>
+
+    <button class="btn">Save Changes</button>
+  </div>
+</section>
+<!-- DASHBOARD -->
+<section id="dashboard" class="hidden">
+  <div class="card">
+    <h2>Welcome, Explorer 👋</h2>
+    <p>Membership: <strong>Wander Net</strong></p>
+    <p>🎯 Mission “Explore East Austin” – 3/5 complete</p>
+    <div class="badge">🔥 First Event</div>
+    <div class="badge">🏅 Community Star</div>
+  </div>
+
+  <div class="card">
+    <h3>🌮 Tacos & Tech</h3>
+    <p>Network with devs over tacos and beer</p>
+    <button class="btn" onclick="attendEvent('Tacos & Tech', 'TECH123')">Attend</button>
+  </div>
+
+  <div class="card">
+    <h3>Featured Businesses</h3>
+    <ul>
+      <li><strong>HopHeads Brewery</strong> – 3 events</li>
+      <li><strong>Code & Coffee</strong> – Tech every Friday</li>
+    </ul>
+  </div>
+</section>
+
+<!-- EVENTS -->
+<section id="events" class="hidden">
+  <div class="card">
+    <div id="selectedEvent" class="card hidden">
+      <div style="text-align:center; margin: 10px 0;" id="eventDots"></div>
+
+      <h3 id="eventTitle">Event Title</h3>
+      <img id="eventImage" src="" alt="Event Image" style="width: 100%; border-radius: 8px; margin-bottom: 10px;" />
+      <div id="eventSteps">
+        <button class="btn" onclick="nextQuestStep(1)">Step 1: Check In</button>
+        <button class="btn hidden" onclick="nextQuestStep(2)">Step 2: Complete Task</button>
+        <button class="btn hidden" onclick="nextQuestStep(3)">Step 3: Meet Someone New</button>
+        <button class="btn hidden" onclick="nextQuestStep(4)">Step 4: Final Challenge</button>
+      </div>
+    </div>
+    
+    <div id="eventList"></div>
+    
+    <h2>Events</h2>
+    <label>Filter:</label>
+    <select>
+      <option>Lunch</option>
+      <option>Amusement Park</option>
+    </select>
+  </div>
+
+  <div class="card">
+    <h3>🎨 Paint & Sip</h3>
+    <p>Rooftop painting + wine & cheese</p>
+    <button class="btn" onclick="attendEvent('Paint & Sip', 'ABCD123')">Attend</button>
+    <div class="review-dots">
+      <span>●</span><span>●</span><span>●</span><span>●</span><span>●</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Google Map</h3>
+    <div style="height:300px; background:#ddd; text-align:center; line-height:300px;">
+      Google Maps API here
+    </div>
+  </div>
+</section>
+
+<!-- MISSIONS -->
+  <div class="card">
+    <h2>Your Missions</h2>
+    <ul id="missionList">
+      <li><input type="checkbox" onchange="checkMissionProgress()" data-id="0"> Explore East Austin</li>
+      <li><input type="checkbox" onchange="checkMissionProgress()" data-id="1"> Game Night</li>
+      <li><input type="checkbox" onchange="checkMissionProgress()" data-id="2"> Brewery Crawl</li>
+      <li><input type="checkbox" onchange="checkMissionProgress()" data-id="3"> Talk to a Stranger</li>
+    </ul>
+    
+    <div id="missionBadge" style="margin-top: 10px;"></div>
+  </div>
+</section>
+
+<!-- MY EVENTS -->
+<section id="myEvents" class="hidden">
+  <div class="card">
+    <h2>My Attending Events</h2>
+    <div id="attendingEventsList">
+      <p>You haven’t joined any events yet.</p>
+    </div>
+  </div>
+</section>
+
+<!-- MESSAGES -->
+<section id="messages" class="hidden">
+  <div class="card">
+    <h2>Messages</h2>
+
+    <!-- Tabs -->
+    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+      <button class="btn" onclick="toggleMsgTab('chat')">💬 Chat</button>
+      <button class="btn" onclick="toggleMsgTab('notif')">🔔 Notifications</button>
+    </div>
+
+    <!-- Chat Messages -->
+    <div id="chatTab">
+      <div id="chatFeed">
+        <div><strong>Kayla M.:</strong> Going to the Paint & Sip tonight?</div>
+        <div><strong>You:</strong> Yup! I'll be there at 7.</div>
+      </div>
+
+      <!-- New message input -->
+      <div style="margin-top: 20px;">
+        <label for="newChat">Send a message:</label>
+        <input type="text" id="newChat" placeholder="Type a message..." />
+        <button class="btn" onclick="sendChat()">Send</button>
+      </div>
+    </div>
+
+    <!-- Notifications -->
+    <div id="notifTab" style="display: none;">
+      <div><strong>Wander:</strong> 🏅 You earned the “Explorer” badge!</div>
+      <div><strong>Wander:</strong> 🎯 New mission posted in East Austin</div>
+      <div><strong>Wander:</strong> ✅ You've completed “Intro Scavenger Hunt”</div>
+    </div>
+  </div>
+</section>
+<!-- SETTINGS -->
+<section id="settings" class="hidden">
+  <div class="card">
+    <h2>Settings</h2>
+
+    <h3>🔔 Notifications</h3>
+    <div class="toggle"><span>Event Reminders</span><input type="checkbox" /></div>
+    <div class="toggle"><span>Messages</span><input type="checkbox" /></div>
+    <div class="toggle"><span>Badge Alerts</span><input type="checkbox" /></div>
+
+    <h3>🔒 Privacy</h3>
+    <div class="toggle"><span>Public Profile</span><input type="checkbox" /></div>
+    <div class="toggle"><span>Allow Messages</span><input type="checkbox" /></div>
+
+    <h3>🎨 Theme & UI</h3>
+    <div class="toggle"><span>Dark Mode</span><input type="checkbox" onchange="toggleTheme()" /></div>
+    <div class="toggle"><span>Reduce Motion</span><input type="checkbox" /></div>
+  </div>
+</section>
+
+<!-- MEMBERSHIP -->
+<section id="membership" class="hidden">
+  <div class="card">
+    <h2>Wander Membership Tiers</h2>
+    <p>Choose the plan that fits your adventure style.</p>
+
+    <div class="card">
+      <h3>🎒 Wander Free</h3>
+      <p><strong>Free</strong> – Pay per event. Connect with locals and go on community quests.</p>
+      <button class="btn" disabled>Current Plan</button>
+    </div>
+
+    <div class="card">
+      <h3>🚀 Wander Plus</h3>
+      <p><strong>$25/month</strong> – 2 events. Unlock sports, scavenger hunts & more.</p>
+      <form action="https://www.paypal.com/checkoutnow" method="post" target="_blank">
+        <input type="hidden" name="amount" value="25.00">
+        <button type="submit" class="gold">Upgrade via PayPal</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3>💼 Wander Net</h3>
+      <p><strong>$30/month</strong> – 4 events. Ideal for professionals & premium meetups.</p>
+      <form action="https://www.paypal.com/checkoutnow" method="post" target="_blank">
+        <input type="hidden" name="amount" value="30.00">
+        <button type="submit" class="gold">Upgrade via PayPal</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3>🏢 Wander Team</h3>
+      <p><strong>$500–$5000</strong> – One-time curated quests for company teams with bulk discounts.</p>
+      <form action="https://www.paypal.com/checkoutnow" method="post" target="_blank">
+        <input type="hidden" name="amount" value="500.00">
+        <button type="submit" class="gold">Team Pricing Inquiry</button>
+      </form>
+    </div>
+  </div>
+</section>
+<script>
+  const sampleMissions = [
+  "Take a photo at the venue",
+  "Try something new",
+  "Compliment someone",
+  "Ask someone about their work",
+  "Post on social media with #WanderQuest",
+  "High five 3 people",
+  "Leave a review after the event",
+  "Join a group conversation",
+  "Tag Wander in a story",
+  "Grab a business card"
+];
+
+  let isSignup = false;
+  let attendingEvents = [];
+  
+  
+  
+  window.onload = () => 
+
+    function switchPage(pageId) {
+  const pages = ["dashboard",  "missions"];
+  pages.forEach(p => {
+    const el = document.getElementById(p);
+    if (el) el.classList.add("hidden");
+  });
+
+  const target = document.getElementById(pageId);
+  if (target) target.classList.remove("hidden");
+
+  // Nav highlighting
+  document.querySelectorAll("nav a").forEach(link => {
+    link.classList.remove("active");
+    if (link.textContent.toLowerCase().includes(pageId.toLowerCase())) {
+      link.classList.add("active");
+    }
+  });
+}
+  
+function switchPage(pageId) {
+  const pages = ["dashboard", "missions"];
+  pages.forEach(p => {
+    const el = document.getElementById(p);
+    if (el) el.classList.add("hidden");
+  });
+
+  const target = document.getElementById(pageId);
+  if (target) target.classList.remove("hidden");
+
+  // Highlight active nav
+  document.querySelectorAll("nav a").forEach(link => {
+    link.classList.remove("active");
+    if (link.textContent.toLowerCase().includes(pageId.toLowerCase())) {
+      link.classList.add("active");
+    }
+  });
+
+  // Only update badges and missions in relevant pages
+  if (pageId === "missions" || pageId === "dashboard") {
+    restoreMissions();       // Load saved checkboxes
+    updateBadgeCount();      // Update badge count
+  }
+}
+
+  
+  function populateSelect(id, list = [], start = 0, end = 0) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = "";
+    if (list.length) {
+      list.forEach(item => {
+        const opt = document.createElement("option");
+        opt.text = item;
+        el.appendChild(opt);
+      });
+    } else {
+      for (let i = start; i <= end; i++) {
+        const opt = document.createElement("option");
+        opt.text = i;
+        el.appendChild(opt);
+      }
+    }
+  }
+  
+  function handleLogin() {
+    const email = document.getElementById("modalEmail").value;
+    const pass = document.getElementById("modalPass").value;
+    if (!email || !pass) return alert("Enter email & password.");
+    closeLoginModal();
+    switchPage("dashboard");
+  }
+  
+  function handleSignup() {
+    const name = document.getElementById("signupName").value;
+    const email = document.getElementById("signupEmail").value;
+    const pass = document.getElementById("signupPass").value;
+    if (!name || !email || !pass) return alert("Complete all fields.");
+    closeSignupModal();
+    switchPage("profile");
+  }
+  
+  function showLoginModal() {
+    document.getElementById("signupModal").style.display = "none";
+    document.getElementById("loginModal").style.display = "flex";
+  }
+  
+  function showSignupModal() {
+    document.getElementById("loginModal").style.display = "none";
+    document.getElementById("signupModal").style.display = "flex";
+  }
+  
+  function closeLoginModal() {
+    document.getElementById("loginModal").style.display = "none";
+  }
+  
+  function closeSignupModal() {
+    document.getElementById("signupModal").style.display = "none";
+  }
+  
+  function sendChat() {
+    const input = document.getElementById("newChat");
+    const message = input.value.trim();
+    if (message) {
+      const feed = document.getElementById("chatFeed");
+      const msg = document.createElement("div");
+      msg.innerHTML = `<strong>You:</strong> ${message}`;
+      feed.appendChild(msg);
+      input.value = "";
+    }
+  }
+  
+  function toggleMsgTab(tab) {
+    document.getElementById("chatTab").style.display = tab === 'chat' ? 'block' : 'none';
+    document.getElementById("notifTab").style.display = tab === 'notif' ? 'block' : 'none';
+  }
+  
+  function attendEvent(name, code) {
+    attendingEvents.push({ name, verified: false, code });
+    alert(`You're attending "${name}".`);
+    renderMyEvents();
+  }
+  
+  function renderMyEvents() {
+    const container = document.getElementById("attendingEventsList");
+    container.innerHTML = "";
+    if (!attendingEvents.length) return container.innerHTML = "<p>No events joined yet.</p>";
+  
+    attendingEvents.forEach((event, i) => {
+      const div = document.createElement("div");
+      div.className = "card";
+      div.innerHTML = `
+        <strong>${event.name}</strong><br>
+        ${event.verified ? '✅ Verified ✔️ — Badge earned 🏅' : `<button onclick="promptCode(${i})">Enter Verification Code</button>`}
+      `;
+      container.appendChild(div);
+    });
+  }
+  
+  function promptCode(index) {
+    const userCode = prompt("Enter verification code from the event:");
+    if (userCode === attendingEvents[index].code) {
+      attendingEvents[index].verified = true;
+      alert("🎉 Verified! Badge earned.");
+      renderMyEvents();
+      addBadge("Event Verified");
+    } else {
+      alert("❌ Incorrect code. Try again.");
+    }
+  }
+  
+  function addBadge(name) {
+    const badgeContainer = document.querySelector(".badge");
+    const badge = document.createElement("span");
+    badge.className = "badge";
+    badge.textContent = `🏅 ${name}`;
+    badgeContainer?.appendChild(badge);
+  }
+  
+  function toggleTheme() {
+    document.body.style.background = document.body.style.background === "#222" ? "#f4f4f4" : "#222";
+    document.body.style.color = document.body.style.color === "#fff" ? "#333" : "#fff";
+  }
+
+  const industries = [
+  "Technology", "Finance", "Healthcare", "Education", "Real Estate", "Legal", "Hospitality", "Retail", "Construction",
+  "Engineering", "Entertainment", "Marketing", "Advertising", "Insurance", "Manufacturing", "Automotive", "Agriculture",
+  "Logistics", "Media", "Publishing", "Energy", "Government", "Telecommunications", "Aerospace", "Biotech", "Cybersecurity",
+  "Defense", "Pharmaceutical", "Nonprofit", "E-commerce", "Fashion", "Food & Beverage", "Art & Design", "Architecture",
+  "Tourism", "Transportation", "Sports", "Consulting", "Data Science", "Event Planning", "Gaming", "HR", "Investment",
+  "IT Services", "Law Enforcement", "Music", "Pet Services", "Photography", "Politics", "Printing", "Product Design",
+  "Public Relations", "Recruiting", "Research", "Sales", "Security", "Social Media", "Software Dev", "Space", "Startups",
+  "Streaming", "Supply Chain", "Translation", "UX/UI", "Venture Capital", "Veterinary", "Waste Management", "Wellness",
+  "Writing", "AI/ML", "Blockchain", "Cloud Computing", "Crypto", "Data Analytics", "EdTech", "FinTech", "Green Energy",
+  "Interior Design", "Journalism", "Marine Biology", "Mathematics", "Meteorology", "Nanotech", "Neuroscience", "Oceanography",
+  "Optometry", "Paralegal", "Public Safety", "Quantum Computing", "Robotics", "SaaS", "Sociology", "Speech Therapy", "Therapy",
+  "User Research", "Voice Tech", "Web Dev", "Zoology", "3D Printing", "Antique Sales", "Drone Tech"
+];
+
+const interests = [
+  "Bar Crawls", "Board Games", "Basketball", "Hockey", "Live Music", "Painting", "Breweries", "Computers", "Gaming",
+  "Sports", "Cars", "Yoga", "Cooking", "Biking", "Hiking", "Climbing", "Reading", "Writing", "Volunteering", "Tech Events",
+  "Photography", "Gardening", "Fishing", "Swimming", "Running", "Traveling", "Museum Tours", "Nightlife", "Brunch",
+  "Theater", "Dancing", "Coding", "AI", "Investing", "Skating", "Beach Trips", "Camping", "Movie Nights", "Karaoke",
+  "Astrology", "Chess", "Debates", "Crafting", "DIY", "Sewing", "Pottery", "Trivia", "Skiing", "Snowboarding",
+  "Skateboarding", "Sci-Fi", "Fantasy", "Fashion", "Thrifting", "Horror Movies", "Podcasts", "Anime", "Comics",
+  "Documentaries", "Science Talks", "Crypto", "Hackathons", "Meditation", "Self-Help", "Fitness", "Gym", "Martial Arts",
+  "Weightlifting", "Surfing", "Standup Comedy", "Poetry", "Jazz", "Indie Music", "Concerts", "Fairs", "Food Festivals",
+  "Startup Pitches", "Public Speaking", "Mentorship", "Language Exchange", "Skincare", "Makeup", "Interior Design",
+  "VR Gaming", "Board Game Design", "Film Making", "YouTubing", "Streaming", "Charity Work", "Mixology", "Craft Beer",
+  "Wineries", "Home Brewing", "Baking", "Street Food", "Pet Sitting", "Aquariums", "Tattoo Art", "Graffiti Art"
+];
+
+populateSelect("industrySelect2", industries);
+populateSelect("interestSelect2", interests);
+
+let missionBadgeEarned = false;
+let badgeCount = 0;
+
+function checkMissionProgress() {
+  const checks = document.querySelectorAll('#missionList input[type="checkbox"]');
+  const allDone = Array.from(checks).every(box => box.checked);
+
+  checks.forEach(box => {
+    const id = box.dataset.id;
+    localStorage.setItem(`mission_${id}`, box.checked);
+  });
+
+  if (allDone && !missionBadgeEarned) {
+    missionBadgeEarned = true;
+    badgeCount++;
+    const badgeBox = document.getElementById("missionBadge");
+    badgeBox.innerHTML = `<div class="badge">🎉 Congrats! You earned a badge</div>`;
+    updateBadgeCount();
+  }
+}
+
+function restoreMissions() {
+  const checks = document.querySelectorAll('#missionList input[type="checkbox"]');
+  checks.forEach(box => {
+    const id = box.dataset.id;
+    box.checked = localStorage.getItem(`mission_${id}`) === "true";
+  });
+}
+
+
+function updateBadgeCount() {
+  const badgeContainer = document.querySelector(".badges");
+  if (badgeContainer) {
+    const badgeCountEl = document.getElementById("badgeCount");
+    if (badgeCountEl) {
+      badgeCountEl.textContent = `🏅 ${badgeCount}`;
+    } else {
+      const badgeEl = document.createElement("span");
+      badgeEl.id = "badgeCount";
+      badgeEl.className = "badge";
+      badgeEl.textContent = `🏅 ${badgeCount}`;
+      badgeContainer.appendChild(badgeEl);
+    }
+  }
+}
+
+
+
+
+
+let currentEventIndex = 0;
+
+function loadEvents() {
+  renderEvent(currentEventIndex);
+  renderEventDots();
+}
+
+function startEvent(i) {
+  currentEvent = mockEvents[i];
+  questProgress = 0;
+
+  document.getElementById("eventTitle").innerText = currentEvent.name;
+  document.getElementById("eventImage").src = currentEvent.img;
+  document.getElementById("selectedEvent").classList.remove("hidden");
+
+  const buttons = document.querySelectorAll("#eventSteps button");
+  buttons.forEach(btn => btn.classList.add("hidden"));
+  buttons[0].classList.remove("hidden");
+
+  // Generate 4 new missions and inject into Missions tab
+  const shuffled = [...sampleMissions].sort(() => 0.5 - Math.random());
+  const selected = shuffled.slice(0, 3); // last task is verification
+  const missionHTML = selected.map((m, i) => 
+    `<li><input type="checkbox" onchange="checkMissionProgress()" data-id="${i}"> ${m}</li>`).join('');
+  const last = `<li><input type="checkbox" onchange="promptCodeFromTask()" data-id="verify"> 🔐 Final Code Task</li>`;
+  
+  document.getElementById("missionList").innerHTML = missionHTML + last;
+  missionBadgeEarned = false;
+}
+
+
+function renderEventDots() {
+  const dotContainer = document.getElementById("eventDots");
+  dotContainer.innerHTML = "";
+  for (let i = 0; i < mockEvents.length; i++) {
+    const dot = document.createElement("span");
+    dot.textContent = "●";
+    dot.style.cursor = "pointer";
+    dot.style.margin = "0 5px";
+    dot.style.color = i === currentEventIndex ? "#28a745" : "#bbb";
+    dot.onclick = () => {
+      currentEventIndex = i;
+      renderEvent(i);
+      renderEventDots();
+    };
+    dotContainer.appendChild(dot);
+  }
+}
+loadEvents(); // Already in your window.onload
+function promptCodeFromTask() {
+  const userCode = prompt("Enter the final verification code from your last task:");
+  if (userCode === "0000") {
+    badgeCount++;
+    updateBadgeCount();
+    document.getElementById("missionBadge").innerHTML = `<div class="badge">🏅 Event Verified — Badge Earned!</div>`;
+  } else {
+    alert("❌ Incorrect code. Please check your last task again.");
+    const verifyBox = document.querySelector('input[data-id="verify"]');
+    if (verifyBox) verifyBox.checked = false;
+  }
+}
+
+  </script>
+  </body>
+  </html>
+  
